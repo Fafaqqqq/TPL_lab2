@@ -60,16 +60,16 @@ extern int yydebug;
     TOK_INDEX = 261,               /* TOK_INDEX  */
     TOK_DELIM = 262,               /* TOK_DELIM  */
     TOK_STR = 263,                 /* TOK_STR  */
-    TOK_ARITHM = 264,              /* TOK_ARITHM  */
-    TOK_CMP = 265,                 /* TOK_CMP  */
-    TOK_IF = 266,                  /* TOK_IF  */
-    TOK_GOTO = 267,                /* TOK_GOTO  */
-    TOK_LABLE = 268,               /* TOK_LABLE  */
-    TOK_BLOCK_BEGIN = 269,         /* TOK_BLOCK_BEGIN  */
-    TOK_BLOCK_END = 270,           /* TOK_BLOCK_END  */
-    TOK_GAP_O = 271,               /* TOK_GAP_O  */
-    TOK_GAP_C = 272,               /* TOK_GAP_C  */
-    TOK_ASSIGN = 273               /* TOK_ASSIGN  */
+    TOK_CMP = 264,                 /* TOK_CMP  */
+    TOK_IF = 265,                  /* TOK_IF  */
+    TOK_GOTO = 266,                /* TOK_GOTO  */
+    TOK_LABLE = 267,               /* TOK_LABLE  */
+    TOK_BLOCK_BEGIN = 268,         /* TOK_BLOCK_BEGIN  */
+    TOK_BLOCK_END = 269,           /* TOK_BLOCK_END  */
+    TOK_GAP_O = 270,               /* TOK_GAP_O  */
+    TOK_GAP_C = 271,               /* TOK_GAP_C  */
+    TOK_ASSIGN = 272,              /* TOK_ASSIGN  */
+    TOK_ARITHM = 273               /* TOK_ARITHM  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

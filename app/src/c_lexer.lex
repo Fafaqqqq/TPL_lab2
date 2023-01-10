@@ -50,28 +50,27 @@ static void printLexeme(const char * tokName)
 
 digit [0-9]
 letter [a-zA-Z]
-delim [;,]
-gap_open \(
-gap_close \)
+gap [()]
 space [ \t]+
-block_begin \{
-block_end   \}
+block [{}]
 
 octa [0-7]
 hex [0-9a-f]
 binary [01]
 
 id ("_"|{letter})("_"|{letter}|{digit})*
-lable ("_"|{letter}|{digit})+":"
+lable ("_"|{letter}|{digit})+:
 
 int [-+]?("0"?("x"{hex}+|"b"{binary}+|{octa}+)|{digit}+)[uUlL]?[uUlL]?
 float [-+]?({digit}*\.{digit}+|{digit}+\.)([eE][-+]?{digit}+)?[fF]?
 string (\".*\")|(\'.*\')
 
-arithm_oper ([+/&|]|"*"|"%"|"-"|"<<"|">>")
+arithm_oper ([+/&|]|"*"|"%"|"-")
 index ("_"|{letter})("_"|{letter}|{digit})+"["({id}|{int})"]"
-assign {arithm_oper}?=
+assign =
 cmp ("<"|">"|"<="|">="|"!="|"=="|"&&"|"||")
+
+WS [ \t\v\f]
 
 %%
 "/*"                { BEGIN(COMMENT_BLOCK); }
@@ -88,27 +87,27 @@ cmp ("<"|">"|"<="|">="|"!="|"=="|"&&"|"||")
 "if" { return TOK_IF; }
 "goto" { return TOK_GOTO; }
 
-
 {cmp} { return TOK_CMP; }
-{arithm_oper} { return TOK_CMP;}
 {assign} { return TOK_ASSIGN; }
-{index} { return TOK_INDEX; }
+{arithm_oper} { return TOK_ARITHM;}
 
 {int} { return TOK_INT; }
 {float} { return TOK_FLOAT; }
 {string}  { return TOK_STR; }
 
-{block_begin} { return TOK_BLOCK_BEGIN; }
-{block_end} { return TOK_BLOCK_END; }
+{block} { return *yytext; }
 {space} {}
 
-{delim} { return TOK_DELIM; }
-{gap_open} { return TOK_GAP_O; }
-{gap_close} { return TOK_GAP_C; }
+";" { return ';'; }
+"," { return ','; }
 
-\r?\n/(.|\n) { dropColumn(); incrLine(1);}
-[^a-zA-Z_0-9+\-*/><!;,=(){}\[\]&|\'" \n\t] { return YYerror; }
-. { printLexeme("UNKNOWN"); }
-\r?\n  { return YYEOF; }
+[\[\]] { return *yytext; }
+{gap} { return *yytext; }
+
+
+[^a-zA-Z_0-9+\-*/><!;,=(){}\[\]&|\'" \n\t] { printLexeme("ERROR"); GotError = true;}
+
+{WS}+ { /* whitespace separates tokens */ }
+. { /* discard bad characters */ }
 
 %%

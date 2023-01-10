@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     }
     yyin = f;
     res = yyparse();
-
+    
     fclose(f);
     fclose(result);
     return res;

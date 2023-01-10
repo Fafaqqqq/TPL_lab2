@@ -2,66 +2,82 @@
 
 %{
 #include "c_lexer.h"
+
 /* Это сигнатуры необходимых bison'у функций */
 void yyerror (char const * s); // функция обработки ошибок
 /* Здесь сигнатуры наших функций */
 // вывод терминалов
-static void printTerminal(const char *tokName)
-{
-  printf("%s\n", tokName);
-}
+static void printTerminal(const char *tokName);
 // вывод нетерминалов
-static void printNonTerminal(const char *tokName)
-{
-  printf("%s\n", tokName);
-}
+static void printNonTerminal(const char *tokName);
 // вывод сообщений об ошибках
-static void printErrorMessage(const char * msg)
-{
-  fprintf(stderr, "%s\n", msg);
-}
-
-void yyerror(char const * msg)
-{
-  fprintf (stderr,
-  "\'%s\' ", msg);
-}
+static void printErrorMessage(const char * msg);
 
 %}
 
-%token TOK_ID TOK_INT TOK_FLOAT TOK_INDEX TOK_DELIM TOK_STR TOK_ARITHM TOK_CMP TOK_IF TOK_GOTO TOK_LABLE TOK_BLOCK_BEGIN TOK_BLOCK_END TOK_GAP_O TOK_GAP_C
-%right TOK_ASSIGN
-%left '<' '>' '='
+%token TOK_ID TOK_INT TOK_FLOAT TOK_INDEX TOK_DELIM TOK_STR TOK_CMP TOK_IF TOK_GOTO TOK_LABLE TOK_BLOCK_BEGIN TOK_BLOCK_END TOK_GAP_O TOK_GAP_C
+%left  TOK_ASSIGN
 %start program
 
-%%
-program: statement { printNonTerminal("statement"); }
-       | program statement { printNonTerminal("program statement"); }
-
-expr: {printNonTerminal("for expr; expr; expr) do oper;"); }
-statement: nfor'('expr';'expr';'expr')' ndo oper';'
-           {printNonTerminal("for expr; expr; expr) do oper;"); }
-          | error';'
-
-oper: statement { printNonTerminal("statement"); }
-    | expr { printNonTerminal("expr"); }
-
-expr_cmp: prim_expr cmp prim_expr
-        { printNonTerminal("prim_expr cmp prim_expr"); }
-
-prim_expr: TOK_ID { printTerminal("TOK_ID");}
-         | TOK_INT { printTerminal("TOK_NUM"); }
-
-cmp: '<' { printTerminal("\'<\'"); }
-   | '>' { printTerminal("\'>\'"); }
-   | '=' { printTerminal("\'=\'"); }
-
-nfor: { printTerminal("TOK_FOR");}
-
-ndo: { printTerminal("TOK_DO");}
-
-nassign: TOK_ASSIGN { printTerminal("TOK_ASSIGN");}
-
-ident: TOK_ID { printTerminal("TOK_ID"); }
+%token TOK_ARITHM
 
 %%
+
+program: statement
+       | program statement
+
+statement
+        : arithm_oper';' { printNonTerminal("ARITHM EXPRESSION"); }
+        | assign_oper';' {  printNonTerminal("ASSIGN EXPRESSION");}
+        | TOK_LABLE { printNonTerminal("LABLE"); }
+        | TOK_ID { printNonTerminal("IDENTIFIER"); }
+        | TOK_IF '(' cmp_oper ')' { printNonTerminal("COMAPRE EXPRESSION"); }
+        | error
+
+num_consts:
+      | TOK_INT
+      | TOK_FLOAT
+
+indexing
+      : TOK_ID'['TOK_ID']'
+      | TOK_ID'['TOK_INT']'
+
+oper_param
+      : TOK_ID
+      | indexing
+      | num_consts
+
+arithm_oper
+      : oper_param TOK_ARITHM oper_param
+      | arithm_oper TOK_ARITHM oper_param
+
+assign_oper
+      : TOK_ID TOK_ASSIGN oper_param
+      | TOK_ID TOK_ASSIGN TOK_STR
+      | TOK_ID TOK_ASSIGN arithm_oper
+      | TOK_ID TOK_ARITHM TOK_ASSIGN arithm_oper
+      | assign_oper TOK_ASSIGN oper_param
+      | assign_oper TOK_ASSIGN TOK_STR
+      | assign_oper TOK_ASSIGN arithm_oper
+      | assign_oper TOK_ARITHM TOK_ASSIGN arithm_oper
+
+cmp_oper
+      : oper_param TOK_CMP oper_param
+      | cmp_oper TOK_CMP oper_param
+      
+%%
+
+
+
+void yyerror(char const * msg)
+{
+  fprintf(stderr, "%d:%d: '%s' - '%s'\n", yylloc.first_line, yylloc.first_column, yytext, msg);
+}
+// вывод терминалов
+static void printTerminal(const char *tokName){
+  fprintf(stdout, "<'%s', %d:%d, %d:%d>\n", tokName, yylloc.first_line, yylloc.first_column, yylloc.last_line, yylloc.last_column);
+}
+// вывод нетерминалов
+static void printNonTerminal(const char *tokName){
+  fprintf(stderr, "<'%s'>\n", tokName);
+}
