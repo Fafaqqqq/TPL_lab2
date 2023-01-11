@@ -27,44 +27,65 @@ program: statement
        | program statement
 
 statement
-        : arithm_oper';' { printNonTerminal("ARITHM EXPRESSION"); }
-        | assign_oper';' {  printNonTerminal("ASSIGN EXPRESSION");}
-        | TOK_LABLE { printNonTerminal("LABLE"); }
-        | TOK_ID { printNonTerminal("IDENTIFIER"); }
-        | TOK_IF '(' cmp_oper ')' { printNonTerminal("COMAPRE EXPRESSION"); }
+        : expression
         | error
 
-num_consts:
-      | TOK_INT
-      | TOK_FLOAT
+string: TOK_STR { printNonTerminal("CONST STRING"); }
+
+number
+      : TOK_INT { printNonTerminal("CONST INT"); }
+      | TOK_FLOAT { printNonTerminal("CONST FLOAT"); }
 
 indexing
-      : TOK_ID'['TOK_ID']'
-      | TOK_ID'['TOK_INT']'
+      : number
+      | TOK_ID'['TOK_ID']' { printNonTerminal("INDEXING"); }
+      | TOK_ID'['TOK_INT']' { printNonTerminal("INDEXING"); }
 
-oper_param
-      : TOK_ID
+param
+      : TOK_ID { printNonTerminal("IDENTIFIER"); }
       | indexing
-      | num_consts
 
-arithm_oper
-      : oper_param TOK_ARITHM oper_param
-      | arithm_oper TOK_ARITHM oper_param
+arithm
+      : param
+      | arithm TOK_ARITHM param { printNonTerminal("ARITHM"); }
+      | param TOK_ARITHM param { printNonTerminal("ARITHM"); }
 
-assign_oper
-      : TOK_ID TOK_ASSIGN oper_param
-      | TOK_ID TOK_ASSIGN TOK_STR
-      | TOK_ID TOK_ASSIGN arithm_oper
-      | TOK_ID TOK_ARITHM TOK_ASSIGN arithm_oper
-      | assign_oper TOK_ASSIGN oper_param
-      | assign_oper TOK_ASSIGN TOK_STR
-      | assign_oper TOK_ASSIGN arithm_oper
-      | assign_oper TOK_ARITHM TOK_ASSIGN arithm_oper
+cmp
+      : arithm
+      | cmp TOK_CMP param { printNonTerminal("COMPARE"); }
+      | param TOK_CMP param { printNonTerminal("COMPARE"); }
 
-cmp_oper
-      : oper_param TOK_CMP oper_param
-      | cmp_oper TOK_CMP oper_param
-      
+assign
+      : cmp
+      /* | TOK_ID TOK_ASSIGN param { printNonTerminal("ASSIGN"); } */
+      | assign TOK_ASSIGN string { printNonTerminal("ASSIGN"); }
+      | assign TOK_ASSIGN cmp { printNonTerminal("ASSIGN"); }
+      /* | TOK_ID TOK_ARITHM TOK_ASSIGN param { printNonTerminal("ARITHM ASSIGN"); } */
+      | assign TOK_ARITHM TOK_ASSIGN cmp { printNonTerminal("ASSIGN"); }
+      /* | assign TOK_ASSIGN param
+      | assign TOK_ASSIGN TOK_STR
+      | assign TOK_ASSIGN arithm
+      | assign TOK_ARITHM TOK_ASSIGN arithm */
+
+
+expression
+      : assign
+      | TOK_LABLE { printNonTerminal("LABLE"); }
+      | TOK_GOTO TOK_ID { printNonTerminal("GOTO"); }
+      | conditional
+      /* | param */
+      | ';' { printNonTerminal("EXPRESSION"); }
+
+gap_expression
+      : '('expression')' { printNonTerminal("GAP EXPRESSION"); }
+
+block_expression
+      : '{' expression '}' { printNonTerminal("BLOCK EXPRESSION"); }
+      | '{' block_expression '}' { printNonTerminal("BLOCK EXPRESSION"); }
+
+conditional
+      : TOK_IF '(' expression ')' statement { printNonTerminal("IF OPERATOR"); }
+      /* | TOK_IF '(' expression ')' expression { printNonTerminal("IF OPERATOR"); } */
 %%
 
 

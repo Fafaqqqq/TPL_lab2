@@ -1,9 +1,8 @@
-a[i] / b + 1 * c - 4 + 5;
+a = a[i] * b + 1 * c - 4 + 5;
 __:
-int a = 0;
+a = 0;
 a = a = a;
   int c = 122;
-  char x = 'a';
   int awd = 0b1L;
   int skulagf= 1598ll;
   short lgalf = 01;

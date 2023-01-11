@@ -50,7 +50,6 @@ static void printLexeme(const char * tokName)
 
 digit [0-9]
 letter [a-zA-Z]
-gap [()]
 space [ \t]+
 block [{}]
 
@@ -63,7 +62,7 @@ lable ("_"|{letter}|{digit})+:
 
 int [-+]?("0"?("x"{hex}+|"b"{binary}+|{octa}+)|{digit}+)[uUlL]?[uUlL]?
 float [-+]?({digit}*\.{digit}+|{digit}+\.)([eE][-+]?{digit}+)?[fF]?
-string (\".*\")|(\'.*\')
+string (\".*\")
 
 arithm_oper ([+/&|]|"*"|"%"|"-")
 index ("_"|{letter})("_"|{letter}|{digit})+"["({id}|{int})"]"
@@ -102,7 +101,8 @@ WS [ \t\v\f]
 "," { return ','; }
 
 [\[\]] { return *yytext; }
-{gap} { return *yytext; }
+"(" { return *yytext; }
+")" { return *yytext; }
 
 
 [^a-zA-Z_0-9+\-*/><!;,=(){}\[\]&|\'" \n\t] { printLexeme("ERROR"); GotError = true;}
